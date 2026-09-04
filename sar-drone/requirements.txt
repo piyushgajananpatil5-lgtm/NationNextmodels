@@ -1,0 +1,9 @@
+# JetPack 6 / Python 3.10 compatible application dependencies.
+# Install Jetson's NVIDIA torch/torchvision wheels separately; do not replace them with PyPI wheels.
+ultralytics==8.3.0
+opencv-python==4.10.0.84
+numpy==1.26.4
+networkx==3.3
+pyserial==3.5
+PyYAML==6.0.2
+pytest==8.3.3
