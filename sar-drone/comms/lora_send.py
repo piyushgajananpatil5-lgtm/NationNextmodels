@@ -97,6 +97,12 @@ class LoRaSender:
                 raise ValueError("max_packet_bytes is too small for a fragment envelope")
             chunk_size -= 1
 
+    def send_event(self, event: str, gps: Sequence[float], detections: list[Mapping[str, Any]], waypoints: list[Sequence[float]]) -> None:
+        """Transmit the standard SAR event schema."""
+        if len(gps) != 2:
+            raise ValueError("gps must be [latitude, longitude]")
+        self.send({"event": event, "gps": list(gps), "detections": detections, "waypoints": waypoints})
+
 
 def decode_packet(packet: bytes) -> Mapping[str, Any]:
     """Validate a framed packet and return its JSON payload."""
@@ -152,8 +158,3 @@ class LoRaReassembler:
             raise ValueError("reassembled payload must be a JSON object")
         return result
 
-    def send_event(self, event: str, gps: Sequence[float], detections: list[Mapping[str, Any]], waypoints: list[Sequence[float]]) -> None:
-        """Transmit the standard SAR event schema."""
-        if len(gps) != 2:
-            raise ValueError("gps must be [latitude, longitude]")
-        self.send({"event": event, "gps": list(gps), "detections": detections, "waypoints": waypoints})
