@@ -8,11 +8,12 @@ JetPack 6 supplies CUDA, TensorRT, and the Jetson-specific PyTorch build. Flash 
 
 ```bash
 chmod +x setup_jetson.sh
+export JETSON_TORCH_WHEEL_URL='https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl'
 ./setup_jetson.sh
 source .venv/bin/activate
 ```
 
-The setup script installs system OpenCV/TensorRT development packages, creates a Python 3.10 virtual environment, and installs the pinned application dependencies. Install NVIDIA's matching PyTorch and torchvision wheels in the environment before running Ultralytics if they are not already present in your JetPack image.
+Set `JETSON_TORCH_WHEEL_URL` to the NVIDIA wheel matching the board's JetPack release. Set `JETSON_TORCHVISION_WHEEL_URL` as well when a matching torchvision wheel is required. The setup script installs these wheels before the pinned application dependencies, uses system site packages for the apt-provided TensorRT bindings, and fails if CUDA is not available through PyTorch.
 
 ## Dataset
 

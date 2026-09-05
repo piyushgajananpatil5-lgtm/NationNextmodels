@@ -1,12 +1,13 @@
 """Fast sanity tests for the SAR pipeline modules."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import cv2
 import numpy as np
 
-from comms.lora_send import LoRaSender
+from comms.lora_send import LoRaReassembler, LoRaSender
 from data.prepare_dataset import prepare_dataset
 from models.model1_stitching.stitch import Stitcher
 from models.model2_detection.infer import Detection
@@ -26,6 +27,20 @@ def test_lora_packet_has_framing_and_crc() -> None:
     packet = LoRaSender("loop://").encode({"event": "test", "gps": [1.0, 2.0]})
     assert packet[:4] == b"SAR1"
     assert int.from_bytes(packet[4:6], "big") == len(packet[6:-4])
+
+
+def test_lora_fragments_and_reassembles_large_payload() -> None:
+    payload = {"event": "path", "waypoints": [[17.4, 78.4]] * 80}
+    sender = LoRaSender("loop://", max_packet_bytes=160)
+    body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    packets = sender._fragment_packets(body)
+
+    assert len(packets) > 1
+    reassembler = LoRaReassembler()
+    result = None
+    for packet in reversed(packets):
+        result = reassembler.add(packet) or result
+    assert result == payload
 
 
 def test_detection_serializes() -> None:
